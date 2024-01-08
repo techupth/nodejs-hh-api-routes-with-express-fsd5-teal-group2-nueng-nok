@@ -8,7 +8,29 @@ let commentsMock = comments;
 const app = express();
 const port = 4000;
 
+app.get("/assignments/:assignmentsId/comments", (req, res) => {
+  let assignmentsIdFromUser = Number(req.params.assignmentsId);
+  let commentsData = commentsMock.filter(
+    (comment) => comment.assignmentId === assignmentsIdFromUser
+  );
+
+  if (commentsData.length === 0) {
+    return res.status(404).json({
+      message: "Comments not found for the provided ID",
+      data: [],
+    });
+  }
+
+  const assignment = commentsData.slice(0, 10);
+
+  return res.json({
+    message: "Complete Fetching Comments",
+    data: commentsData,
+  });
+});
+
 app.get("/assignments", (req, res) => {
+  const limit = req.query.limit || 10;
   const totalAssignments = assignmentsMock.length;
 
   if (totalAssignments <= 10) {
@@ -40,10 +62,6 @@ app.get("/assignments/:assignmentsId", (req, res) => {
     message: "Complete Fetching Assignments",
     data: assignmentsData,
   });
-});
-
-app.get("/", (req, res) => {
-  res.json({ message: "Welcome to my application." });
 });
 
 app.use(express.json());
